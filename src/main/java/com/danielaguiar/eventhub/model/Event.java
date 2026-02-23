@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +16,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "events")
+@Table(name = "events", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"name", "date_time", "location"})
+})
 @Getter
 @Setter
 @NoArgsConstructor

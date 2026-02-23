@@ -3,6 +3,7 @@ package com.danielaguiar.eventhub.service;
 import com.danielaguiar.eventhub.dto.request.CreateEventRequest;
 import com.danielaguiar.eventhub.dto.request.UpdateEventRequest;
 import com.danielaguiar.eventhub.dto.response.EventResponse;
+import com.danielaguiar.eventhub.exception.DuplicateEventException;
 import com.danielaguiar.eventhub.exception.EventNotFoundException;
 import com.danielaguiar.eventhub.model.Event;
 import com.danielaguiar.eventhub.repository.EventRepository;
@@ -33,6 +34,10 @@ public class EventService {
 
     @Transactional
     public EventResponse create(CreateEventRequest request) {
+        if (eventRepository.existsByNameAndDateTimeAndLocation(request.name(), request.dateTime(), request.location())) {
+            throw new DuplicateEventException(request.name(), request.location(), request.dateTime());
+        }
+
         Event event = Event.builder()
                 .name(request.name())
                 .dateTime(request.dateTime())
@@ -47,6 +52,10 @@ public class EventService {
     @Transactional
     public EventResponse update(Long id, UpdateEventRequest request) {
         Event event = findEntityById(id);
+
+        if (eventRepository.existsByNameAndDateTimeAndLocationAndIdNot(request.name(), request.dateTime(), request.location(), id)) {
+            throw new DuplicateEventException(request.name(), request.location(), request.dateTime());
+        }
 
         int soldTickets = event.getSoldTickets();
         if (request.capacity() < soldTickets) {

@@ -38,6 +38,18 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(422).body(body);
     }
 
+    @ExceptionHandler(DuplicateEventException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateEvent(DuplicateEventException ex) {
+        ErrorResponse body = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                HttpStatus.CONFLICT.getReasonPhrase(),
+                ex.getMessage(),
+                LocalDateTime.now(),
+                null
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
+    }
+
     @ExceptionHandler(DuplicateTicketException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateTicket(DuplicateTicketException ex) {
         ErrorResponse body = new ErrorResponse(

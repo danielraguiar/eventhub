@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/events")
@@ -32,7 +33,7 @@ public class EventController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<EventResponse> getById(@PathVariable Long id) {
+    public ResponseEntity<EventResponse> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(eventService.findById(id));
     }
 
@@ -44,13 +45,13 @@ public class EventController {
 
     @PutMapping("/{id}")
     public ResponseEntity<EventResponse> update(
-            @PathVariable Long id,
+            @PathVariable UUID id,
             @RequestBody @Valid UpdateEventRequest request) {
         return ResponseEntity.ok(eventService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
         eventService.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +29,7 @@ public class EventService {
     }
 
     @Transactional(readOnly = true)
-    public EventResponse findById(Long id) {
+    public EventResponse findById(UUID id) {
         return EventResponse.from(findEntityById(id));
     }
 
@@ -50,7 +51,7 @@ public class EventService {
     }
 
     @Transactional
-    public EventResponse update(Long id, UpdateEventRequest request) {
+    public EventResponse update(UUID id, UpdateEventRequest request) {
         Event event = findEntityById(id);
 
         if (eventRepository.existsByNameAndDateTimeAndLocationAndIdNot(request.name(), request.dateTime(), request.location(), id)) {
@@ -73,14 +74,14 @@ public class EventService {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public void delete(UUID id) {
         if (!eventRepository.existsById(id)) {
             throw new EventNotFoundException(id);
         }
         eventRepository.deleteById(id);
     }
 
-    Event findEntityById(Long id) {
+    Event findEntityById(UUID id) {
         return eventRepository.findById(id)
                 .orElseThrow(() -> new EventNotFoundException(id));
     }

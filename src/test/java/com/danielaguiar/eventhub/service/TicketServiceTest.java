@@ -21,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -32,6 +33,10 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("TicketService unit tests")
 class TicketServiceTest {
+
+    private static final UUID EVENT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    private static final UUID PARTICIPANT_ID = UUID.fromString("00000000-0000-0000-0000-000000000010");
+    private static final UUID TICKET_ID = UUID.fromString("00000000-0000-0000-0000-000000000100");
 
     @Mock
     private EventService eventService;
@@ -47,7 +52,7 @@ class TicketServiceTest {
 
     private Event buildEvent(int capacity, int soldTickets) {
         return Event.builder()
-                .id(1L)
+                .id(EVENT_ID)
                 .name("Test Event")
                 .dateTime(LocalDateTime.now().plusDays(10))
                 .location("São Paulo")
@@ -58,14 +63,14 @@ class TicketServiceTest {
 
     private Participant buildParticipant() {
         return Participant.builder()
-                .id(10L)
+                .id(PARTICIPANT_ID)
                 .name("Alice")
                 .email("alice@example.com")
                 .build();
     }
 
     private PurchaseTicketRequest buildRequest() {
-        return new PurchaseTicketRequest(1L, "Alice", "alice@example.com");
+        return new PurchaseTicketRequest(EVENT_ID, "Alice", "alice@example.com");
     }
 
     @Test
@@ -74,18 +79,18 @@ class TicketServiceTest {
         Event event = buildEvent(10, 5);
         Participant participant = buildParticipant();
 
-        given(eventService.findEntityById(1L)).willReturn(event);
+        given(eventService.findEntityById(EVENT_ID)).willReturn(event);
         given(participantRepository.findByEmail("alice@example.com")).willReturn(Optional.of(participant));
-        given(ticketRepository.existsByEventIdAndParticipantId(1L, 10L)).willReturn(false);
+        given(ticketRepository.existsByEventIdAndParticipantId(EVENT_ID, PARTICIPANT_ID)).willReturn(false);
         given(ticketRepository.save(any(Ticket.class))).willAnswer(inv -> {
             Ticket t = inv.getArgument(0);
-            t.setId(100L);
+            t.setId(TICKET_ID);
             return t;
         });
 
         TicketResponse response = ticketService.purchase(buildRequest());
 
-        assertThat(response.eventId()).isEqualTo(1L);
+        assertThat(response.eventId()).isEqualTo(EVENT_ID);
         assertThat(response.participantEmail()).isEqualTo("alice@example.com");
         assertThat(response.purchasedAt()).isNotNull();
     }
@@ -96,9 +101,9 @@ class TicketServiceTest {
         Event event = buildEvent(5, 4);
         Participant participant = buildParticipant();
 
-        given(eventService.findEntityById(1L)).willReturn(event);
+        given(eventService.findEntityById(EVENT_ID)).willReturn(event);
         given(participantRepository.findByEmail("alice@example.com")).willReturn(Optional.of(participant));
-        given(ticketRepository.existsByEventIdAndParticipantId(1L, 10L)).willReturn(false);
+        given(ticketRepository.existsByEventIdAndParticipantId(EVENT_ID, PARTICIPANT_ID)).willReturn(false);
         given(ticketRepository.save(any(Ticket.class))).willAnswer(inv -> inv.getArgument(0));
 
         TicketResponse response = ticketService.purchase(buildRequest());
@@ -111,11 +116,11 @@ class TicketServiceTest {
     void purchase_whenEventIsFull_throwsEventFullException() {
         Event event = buildEvent(5, 5);
 
-        given(eventService.findEntityById(1L)).willReturn(event);
+        given(eventService.findEntityById(EVENT_ID)).willReturn(event);
 
         assertThatThrownBy(() -> ticketService.purchase(buildRequest()))
                 .isInstanceOf(EventFullException.class)
-                .hasMessageContaining("1");
+                .hasMessageContaining(EVENT_ID.toString());
 
         verify(ticketRepository, never()).save(any());
     }
@@ -125,7 +130,7 @@ class TicketServiceTest {
     void purchase_whenCapacityIsZero_throwsEventFullException() {
         Event event = buildEvent(0, 0);
 
-        given(eventService.findEntityById(1L)).willReturn(event);
+        given(eventService.findEntityById(EVENT_ID)).willReturn(event);
 
         assertThatThrownBy(() -> ticketService.purchase(buildRequest()))
                 .isInstanceOf(EventFullException.class);
@@ -136,7 +141,7 @@ class TicketServiceTest {
     @Test
     @DisplayName("purchase: when event does not exist, throws EventNotFoundException")
     void purchase_whenEventNotFound_throwsEventNotFoundException() {
-        given(eventService.findEntityById(1L)).willThrow(new EventNotFoundException(1L));
+        given(eventService.findEntityById(EVENT_ID)).willThrow(new EventNotFoundException(EVENT_ID));
 
         assertThatThrownBy(() -> ticketService.purchase(buildRequest()))
                 .isInstanceOf(EventNotFoundException.class);
@@ -150,10 +155,10 @@ class TicketServiceTest {
         Event event = buildEvent(10, 0);
         Participant newParticipant = buildParticipant();
 
-        given(eventService.findEntityById(1L)).willReturn(event);
+        given(eventService.findEntityById(EVENT_ID)).willReturn(event);
         given(participantRepository.findByEmail("alice@example.com")).willReturn(Optional.empty());
         given(participantRepository.save(any(Participant.class))).willReturn(newParticipant);
-        given(ticketRepository.existsByEventIdAndParticipantId(1L, 10L)).willReturn(false);
+        given(ticketRepository.existsByEventIdAndParticipantId(EVENT_ID, PARTICIPANT_ID)).willReturn(false);
         given(ticketRepository.save(any(Ticket.class))).willAnswer(inv -> inv.getArgument(0));
 
         ticketService.purchase(buildRequest());
@@ -170,9 +175,9 @@ class TicketServiceTest {
         Event event = buildEvent(10, 0);
         Participant existingParticipant = buildParticipant();
 
-        given(eventService.findEntityById(1L)).willReturn(event);
+        given(eventService.findEntityById(EVENT_ID)).willReturn(event);
         given(participantRepository.findByEmail("alice@example.com")).willReturn(Optional.of(existingParticipant));
-        given(ticketRepository.existsByEventIdAndParticipantId(1L, 10L)).willReturn(false);
+        given(ticketRepository.existsByEventIdAndParticipantId(EVENT_ID, PARTICIPANT_ID)).willReturn(false);
         given(ticketRepository.save(any(Ticket.class))).willAnswer(inv -> inv.getArgument(0));
 
         ticketService.purchase(buildRequest());
@@ -186,9 +191,9 @@ class TicketServiceTest {
         Event event = buildEvent(10, 1);
         Participant participant = buildParticipant();
 
-        given(eventService.findEntityById(1L)).willReturn(event);
+        given(eventService.findEntityById(EVENT_ID)).willReturn(event);
         given(participantRepository.findByEmail("alice@example.com")).willReturn(Optional.of(participant));
-        given(ticketRepository.existsByEventIdAndParticipantId(1L, 10L)).willReturn(true);
+        given(ticketRepository.existsByEventIdAndParticipantId(EVENT_ID, PARTICIPANT_ID)).willReturn(true);
 
         assertThatThrownBy(() -> ticketService.purchase(buildRequest()))
                 .isInstanceOf(DuplicateTicketException.class)
@@ -203,9 +208,9 @@ class TicketServiceTest {
         Event event = buildEvent(10, 3);
         Participant participant = buildParticipant();
 
-        given(eventService.findEntityById(1L)).willReturn(event);
+        given(eventService.findEntityById(EVENT_ID)).willReturn(event);
         given(participantRepository.findByEmail("alice@example.com")).willReturn(Optional.of(participant));
-        given(ticketRepository.existsByEventIdAndParticipantId(1L, 10L)).willReturn(false);
+        given(ticketRepository.existsByEventIdAndParticipantId(EVENT_ID, PARTICIPANT_ID)).willReturn(false);
         given(ticketRepository.save(any(Ticket.class))).willAnswer(inv -> inv.getArgument(0));
 
         ticketService.purchase(buildRequest());
@@ -220,9 +225,9 @@ class TicketServiceTest {
         Participant participant = buildParticipant();
         LocalDateTime before = LocalDateTime.now();
 
-        given(eventService.findEntityById(1L)).willReturn(event);
+        given(eventService.findEntityById(EVENT_ID)).willReturn(event);
         given(participantRepository.findByEmail("alice@example.com")).willReturn(Optional.of(participant));
-        given(ticketRepository.existsByEventIdAndParticipantId(1L, 10L)).willReturn(false);
+        given(ticketRepository.existsByEventIdAndParticipantId(EVENT_ID, PARTICIPANT_ID)).willReturn(false);
         given(ticketRepository.save(any(Ticket.class))).willAnswer(inv -> inv.getArgument(0));
 
         TicketResponse response = ticketService.purchase(buildRequest());
@@ -237,9 +242,9 @@ class TicketServiceTest {
         Event event = buildEvent(10, 2);
         Participant participant = buildParticipant();
 
-        Ticket t1 = Ticket.builder().id(1L).event(event).participant(participant)
+        Ticket t1 = Ticket.builder().id(TICKET_ID).event(event).participant(participant)
                 .purchasedAt(LocalDateTime.now()).build();
-        Ticket t2 = Ticket.builder().id(2L).event(event).participant(participant)
+        Ticket t2 = Ticket.builder().id(UUID.randomUUID()).event(event).participant(participant)
                 .purchasedAt(LocalDateTime.now()).build();
 
         given(ticketRepository.findByParticipantEmail("alice@example.com")).willReturn(List.of(t1, t2));

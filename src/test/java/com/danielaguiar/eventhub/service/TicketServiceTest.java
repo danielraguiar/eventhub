@@ -45,10 +45,6 @@ class TicketServiceTest {
     @InjectMocks
     private TicketService ticketService;
 
-    // -----------------------------------------------------------------------
-    // Helpers
-    // -----------------------------------------------------------------------
-
     private Event buildEvent(int capacity, int soldTickets) {
         return Event.builder()
                 .id(1L)
@@ -71,10 +67,6 @@ class TicketServiceTest {
     private PurchaseTicketRequest buildRequest() {
         return new PurchaseTicketRequest(1L, "Alice", "alice@example.com");
     }
-
-    // -----------------------------------------------------------------------
-    // purchase() — happy path
-    // -----------------------------------------------------------------------
 
     @Test
     @DisplayName("purchase: when event has capacity, creates ticket and returns DTO")
@@ -114,10 +106,6 @@ class TicketServiceTest {
         assertThat(response).isNotNull();
     }
 
-    // -----------------------------------------------------------------------
-    // purchase() — EventFullException
-    // -----------------------------------------------------------------------
-
     @Test
     @DisplayName("purchase: when event is full, throws EventFullException")
     void purchase_whenEventIsFull_throwsEventFullException() {
@@ -145,10 +133,6 @@ class TicketServiceTest {
         verify(ticketRepository, never()).save(any());
     }
 
-    // -----------------------------------------------------------------------
-    // purchase() — EventNotFoundException
-    // -----------------------------------------------------------------------
-
     @Test
     @DisplayName("purchase: when event does not exist, throws EventNotFoundException")
     void purchase_whenEventNotFound_throwsEventNotFoundException() {
@@ -159,10 +143,6 @@ class TicketServiceTest {
 
         verify(ticketRepository, never()).save(any());
     }
-
-    // -----------------------------------------------------------------------
-    // purchase() — participant upsert
-    // -----------------------------------------------------------------------
 
     @Test
     @DisplayName("purchase: when participant email is new, creates new participant")
@@ -200,10 +180,6 @@ class TicketServiceTest {
         verify(participantRepository, never()).save(any(Participant.class));
     }
 
-    // -----------------------------------------------------------------------
-    // purchase() — DuplicateTicketException
-    // -----------------------------------------------------------------------
-
     @Test
     @DisplayName("purchase: when participant already has a ticket for the event, throws DuplicateTicketException")
     void purchase_whenDuplicatePurchase_throwsDuplicateTicketException() {
@@ -220,10 +196,6 @@ class TicketServiceTest {
 
         verify(ticketRepository, never()).save(any());
     }
-
-    // -----------------------------------------------------------------------
-    // purchase() — side effects
-    // -----------------------------------------------------------------------
 
     @Test
     @DisplayName("purchase: when purchased, increments soldTickets on the event")
@@ -258,10 +230,6 @@ class TicketServiceTest {
         assertThat(response.purchasedAt()).isNotNull();
         assertThat(response.purchasedAt()).isAfterOrEqualTo(before);
     }
-
-    // -----------------------------------------------------------------------
-    // findByParticipantEmail()
-    // -----------------------------------------------------------------------
 
     @Test
     @DisplayName("findByParticipantEmail: when participant has tickets, returns mapped list")

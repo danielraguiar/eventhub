@@ -3,6 +3,7 @@ package com.danielaguiar.eventhub.exception;
 import com.danielaguiar.eventhub.dto.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -76,6 +77,18 @@ public class GlobalExceptionHandler {
                 fieldErrors
         );
         return ResponseEntity.badRequest().body(body);
+    }
+
+    @ExceptionHandler(ErrorResponseException.class)
+    public ResponseEntity<ErrorResponse> handleErrorResponse(ErrorResponseException ex) {
+        int status = ex.getStatusCode().value();
+        HttpStatus httpStatus = HttpStatus.resolve(status);
+        String reasonPhrase = httpStatus != null ? httpStatus.getReasonPhrase() : String.valueOf(status);
+        String message = (httpStatus == HttpStatus.NOT_FOUND)
+                ? "The requested path does not exist. Visit /swagger-ui.html for the API documentation."
+                : reasonPhrase;
+        ErrorResponse body = new ErrorResponse(status, reasonPhrase, message, LocalDateTime.now(), null);
+        return ResponseEntity.status(status).body(body);
     }
 
     @ExceptionHandler(Exception.class)

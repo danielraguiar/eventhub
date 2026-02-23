@@ -33,6 +33,32 @@ server:
   port: ${PORT:8080}
   shutdown: graceful
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: EventHub API
+    description: Sistema de Gestão de Eventos
+    version: 0.0.1-SNAPSHOT
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+
 logging:
   level:
     com.danielaguiar.eventhub: DEBUG

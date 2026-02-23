@@ -14,6 +14,7 @@ API RESTful para gestão de eventos e venda de ingressos, desenvolvida como test
 | Hibernate | 7 (Jakarta JPA 3.2) | ORM |
 | H2 Database | (gerenciado pelo BOM) | Banco de dados |
 | Lombok | (gerenciado pelo BOM) | Redução de boilerplate |
+| logstash-logback-encoder | 8.0 | Logs estruturados em JSON |
 | JUnit 5 + Mockito | (gerenciado pelo BOM) | Testes unitários |
 | Maven | 3.9.12 | Gerenciador de dependências |
 
@@ -191,6 +192,58 @@ O `GlobalExceptionHandler` (`@RestControllerAdvice`) centraliza o mapeamento de 
 ### Estrutura de pacotes por camada (layer-based)
 
 O projeto adota a estrutura convencional com pacotes por camada técnica (`controller`, `service`, `repository`, `model`, `dto`, `exception`), mantendo as responsabilidades de cada camada explicitamente visíveis na hierarquia de pacotes.
+
+---
+
+## Conformidade com The 12 Factor App
+
+O projeto implementa os três fatores solicitados como diferencial:
+
+### Factor III — Config (Configuração via variáveis de ambiente)
+
+Nenhuma credencial ou parâmetro sensível está hardcoded. Todos os valores que variam entre ambientes são lidos de variáveis de ambiente com fallback para defaults de desenvolvimento:
+
+| Variável de ambiente | Default (desenvolvimento) | Descrição |
+|---|---|---|
+| `DB_URL` | `jdbc:h2:file:./data/eventhub;AUTO_SERVER=TRUE` | URL do banco de dados |
+| `DB_DRIVER` | `org.h2.Driver` | Driver JDBC |
+| `DB_USERNAME` | `sa` | Usuário do banco |
+| `DB_PASSWORD` | *(vazio)* | Senha do banco |
+| `JPA_DDL_AUTO` | `update` | Estratégia de DDL do Hibernate |
+| `H2_CONSOLE_ENABLED` | `true` | Habilita o console H2 |
+| `PORT` | `8080` | Porta do servidor |
+| `SHUTDOWN_TIMEOUT` | `30s` | Timeout do graceful shutdown |
+
+Para subir a aplicação com PostgreSQL em produção, por exemplo:
+```bash
+DB_URL=jdbc:postgresql://host:5432/eventhub \
+DB_DRIVER=org.postgresql.Driver \
+DB_USERNAME=postgres \
+DB_PASSWORD=secret \
+JPA_DDL_AUTO=validate \
+H2_CONSOLE_ENABLED=false \
+./mvnw spring-boot:run
+```
+
+### Factor IX — Disposability (Graceful Shutdown)
+
+Configurado via `server.shutdown: graceful` e `spring.lifecycle.timeout-per-shutdown-phase: ${SHUTDOWN_TIMEOUT:30s}`. Ao receber um `SIGTERM`, o Spring Boot aguarda até 30 segundos para que as requisições em andamento terminem antes de encerrar o processo. Isso evita interrupção abrupta de transações ativas.
+
+### Factor XI — Logs (Logs estruturados na stdout)
+
+Utiliza `logstash-logback-encoder` com `logback-spring.xml` configurado para emitir todos os logs como **JSON estruturado na stdout**. O formato JSON permite que ferramentas de observabilidade (ELK Stack, Datadog, CloudWatch Logs) ingiram e indexem os logs automaticamente sem parsing de texto.
+
+Exemplo de linha de log gerada:
+```json
+{
+  "@timestamp": "2026-02-22T10:30:00.123-03:00",
+  "@version": "1",
+  "message": "Event not found with id: 99",
+  "logger_name": "com.danielaguiar.eventhub.service.EventService",
+  "level": "DEBUG",
+  "thread_name": "http-nio-8080-exec-1"
+}
+```
 
 ---
 

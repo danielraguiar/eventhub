@@ -43,6 +43,18 @@ A API estará disponível em `http://localhost:8080`.
 ./mvnw test
 ```
 
+### Dados de exemplo
+
+Ao iniciar pela primeira vez com o banco vazio, a aplicação carrega automaticamente 3 eventos de exemplo:
+
+| ID | Nome | Data | Local | Capacidade |
+|---|---|---|---|---|
+| 1 | Tech Conference 2026 | 2026-08-15 09:00 | São Paulo Convention Center | 200 |
+| 2 | Java Dev Summit | 2026-09-20 10:00 | Rio de Janeiro Expo | 150 |
+| 3 | Spring Boot Workshop | 2026-10-05 14:00 | Online | 50 |
+
+Use `GET /events` para listar os eventos disponíveis e `POST /tickets` para comprar ingressos.
+
 ### Documentação interativa (Swagger UI)
 
 Com a aplicação em execução, acesse:

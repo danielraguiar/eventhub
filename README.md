@@ -15,6 +15,8 @@ API RESTful para gestão de eventos e venda de ingressos, desenvolvida como test
 | H2 Database | (gerenciado pelo BOM) | Banco de dados |
 | Lombok | (gerenciado pelo BOM) | Redução de boilerplate |
 | logstash-logback-encoder | 8.0 | Logs estruturados em JSON |
+| SpringDoc OpenAPI | 2.8.3 | Documentação interativa (Swagger UI) |
+| Spring Boot Actuator | (gerenciado pelo BOM) | Health check e métricas |
 | JUnit 5 + Mockito | (gerenciado pelo BOM) | Testes unitários |
 | Maven | 3.9.12 | Gerenciador de dependências |
 
@@ -40,6 +42,22 @@ A API estará disponível em `http://localhost:8080`.
 ```bash
 ./mvnw test
 ```
+
+### Documentação interativa (Swagger UI)
+
+Com a aplicação em execução, acesse:
+
+| Recurso | URL |
+|---|---|
+| Swagger UI | `http://localhost:8080/swagger-ui.html` |
+| OpenAPI spec (JSON) | `http://localhost:8080/api-docs` |
+
+### Health check (Actuator)
+
+| Endpoint | URL |
+|---|---|
+| Health | `http://localhost:8080/actuator/health` |
+| Info | `http://localhost:8080/actuator/info` |
 
 ### Acessar o console do banco de dados (H2)
 

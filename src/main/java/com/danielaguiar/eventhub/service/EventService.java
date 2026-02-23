@@ -61,7 +61,7 @@ public class EventService {
         int soldTickets = event.getSoldTickets();
         if (request.capacity() < soldTickets) {
             throw new IllegalArgumentException(
-                    "New capacity (%d) cannot be less than tickets already sold (%d)"
+                    "A nova capacidade (%d) não pode ser menor que os ingressos já vendidos (%d)"
                             .formatted(request.capacity(), soldTickets));
         }
 

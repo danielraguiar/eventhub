@@ -5,6 +5,6 @@ import java.util.UUID;
 public class EventFullException extends RuntimeException {
 
     public EventFullException(UUID eventId) {
-        super("Event with id " + eventId + " is at full capacity. No tickets available.");
+        super("O evento com id " + eventId + " está com capacidade esgotada. Não há ingressos disponíveis.");
     }
 }

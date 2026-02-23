@@ -84,7 +84,7 @@ public class GlobalExceptionHandler {
         ErrorResponse body = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                "Validation failed",
+                "Falha de validação",
                 LocalDateTime.now(),
                 fieldErrors
         );
@@ -97,7 +97,7 @@ public class GlobalExceptionHandler {
         HttpStatus httpStatus = HttpStatus.resolve(status);
         String reasonPhrase = httpStatus != null ? httpStatus.getReasonPhrase() : String.valueOf(status);
         String message = (httpStatus == HttpStatus.NOT_FOUND)
-                ? "The requested path does not exist. Visit /swagger-ui.html for the API documentation."
+                ? "O caminho solicitado não existe. Acesse /swagger-ui.html para a documentação da API."
                 : reasonPhrase;
         ErrorResponse body = new ErrorResponse(status, reasonPhrase, message, LocalDateTime.now(), null);
         return ResponseEntity.status(status).body(body);
@@ -108,7 +108,7 @@ public class GlobalExceptionHandler {
         ErrorResponse body = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                "An unexpected error occurred",
+                "Ocorreu um erro inesperado",
                 LocalDateTime.now(),
                 null
         );

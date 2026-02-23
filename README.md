@@ -156,7 +156,7 @@ curl http://localhost:8080/tickets/participant/alice@example.com
 {
   "status": 422,
   "error": "Unprocessable Entity",
-  "message": "Event with id 1 is at full capacity. No tickets available.",
+  "message": "O evento com id 3fa85f64-5717-4562-b3fc-2c963f66afa6 está com capacidade esgotada. Não há ingressos disponíveis.",
   "timestamp": "2026-02-22T10:30:00",
   "fieldErrors": null
 }
@@ -168,11 +168,11 @@ curl http://localhost:8080/tickets/participant/alice@example.com
 {
   "status": 400,
   "error": "Bad Request",
-  "message": "Validation failed",
+  "message": "Falha de validação",
   "timestamp": "2026-02-22T10:30:00",
   "fieldErrors": [
-    "name: Event name must not be blank",
-    "dateTime: Event date must be in the future"
+    "name: O nome do evento não pode estar em branco",
+    "dateTime: A data do evento deve ser no futuro"
   ]
 }
 ```

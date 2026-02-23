@@ -10,21 +10,21 @@ import java.time.LocalDateTime;
 
 public record CreateEventRequest(
 
-        @NotBlank(message = "Event name must not be blank")
+        @NotBlank(message = "O nome do evento não pode estar em branco")
         @Schema(example = "Tech Conference 2026")
         String name,
 
-        @NotNull(message = "Date and time must not be null")
-        @Future(message = "Event date must be in the future")
+        @NotNull(message = "A data e horário não podem ser nulos")
+        @Future(message = "A data do evento deve ser no futuro")
         @Schema(example = "2026-08-15T09:00:00")
         LocalDateTime dateTime,
 
-        @NotBlank(message = "Location must not be blank")
+        @NotBlank(message = "O local não pode estar em branco")
         @Schema(example = "São Paulo Convention Center")
         String location,
 
-        @NotNull(message = "Capacity must not be null")
-        @Positive(message = "Capacity must be a positive number")
+        @NotNull(message = "A capacidade não pode ser nula")
+        @Positive(message = "A capacidade deve ser um número positivo")
         @Schema(example = "200")
         Integer capacity
 ) {

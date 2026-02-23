@@ -9,16 +9,16 @@ import java.util.UUID;
 
 public record PurchaseTicketRequest(
 
-        @NotNull(message = "Event ID must not be null")
+        @NotNull(message = "O ID do evento não pode ser nulo")
         @Schema(example = "3fa85f64-5717-4562-b3fc-2c963f66afa6")
         UUID eventId,
 
-        @NotBlank(message = "Participant name must not be blank")
+        @NotBlank(message = "O nome do participante não pode estar em branco")
         @Schema(example = "Alice Silva")
         String participantName,
 
-        @NotBlank(message = "Participant email must not be blank")
-        @Email(message = "Participant email must be a valid email address")
+        @NotBlank(message = "O e-mail do participante não pode estar em branco")
+        @Email(message = "O e-mail do participante deve ser um endereço válido")
         @Schema(example = "alice@example.com")
         String participantEmail
 ) {
